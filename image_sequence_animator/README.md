@@ -11,12 +11,7 @@ A simple widget for animating a set of images with full custom controls as an al
 ## Media
 *Videos*
 
-* [v1.0.0](https://youtu.be/p79ELnwg7Mw)
-
-*GIFs*
-<br><br>
-<img src="https://www.cosmossoftware.coffee/Common/Portfolio/GIFs/FlutterImageSequenceAnimator.gif"/>
-<br><br>
+[![Image Sequence Animator](https://www.cosmossoftware.coffee/Common/Portfolio/GIFs/FlutterImageSequenceAnimator.jpg)](https://youtu.be/xZ9vdVkI4Vc)
 
 
 <a name="description"></a>
