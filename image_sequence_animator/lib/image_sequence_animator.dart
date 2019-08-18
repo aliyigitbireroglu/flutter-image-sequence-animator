@@ -107,6 +107,7 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   final bool isAutoPlay;
   Color color;
 
+  ///The [AnimationController] used to control the image sequence.
   AnimationController animationController;
 
   int previousFrame = 0;
