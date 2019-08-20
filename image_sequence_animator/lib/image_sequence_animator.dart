@@ -5,8 +5,8 @@
 // other asset files. If you were granted this Intellectual Property for personal use, you are obligated to include this copyright                   /
 // text at all times.                                                                                                                                /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 //@formatter:off
+
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -215,6 +215,7 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
     animationController.stop();
   }
 
+  ///Only use either value or percentage.
   void skip(double value, {double percentage: -1.0}) {
     if (percentage != -1.0)
       animationController.value = totalTime * percentage;

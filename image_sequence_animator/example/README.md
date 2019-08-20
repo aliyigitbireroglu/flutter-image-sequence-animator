@@ -7,9 +7,14 @@ Example Project for image_sequence_animator.
 
 A simple widget for animating a set of images with full custom controls as an alternative to using a GIF file.
 
-1. [Media](#media) 
-2. [Description](#description) 
-3. [How-to-Use](#howtouse)
+[Media](#media) | [Description](#description) | [How-to-Use](#howtouse)
+
+<img src="https://img.shields.io/badge/Cosmos%20Software-Love%20Code-red"/>
+<br>
+
+
+[![Pub](https://img.shields.io/pub/v/image_sequence_animator?color=g)](https://pub.dev/packages/image_sequence_animator)
+[![License](https://img.shields.io/github/license/aliyigitbireroglu/flutter-image-sequence-animator?color=blue)](https://github.com/aliyigitbireroglu/flutter-image-sequence-animator/blob/master/LICENSE)
 
 
 <a name="media"></a>
@@ -28,11 +33,41 @@ color, play, pause, stop, skip, rewind, restart and more.
 
 <a name="howtouse"></a>
 ## How-to-Use
-First, add your image sequence to your assets and update the "pubspec.yaml" accordingly. Then simply create an ImageSequenceAnimator widget with 
-your parameters. That's it!
+First, add your image sequence to your assets and update the "pubspec.yaml" accordingly. 
 
-Please see the example project and the documentation for understanding the parameters.
+Then create an ImageSequenceAnimator widget as shown in the example:
 
+```
+ImageSequenceAnimator(
+  "ImageSequence", 
+  "Frame_", 
+  0, 
+  5, 
+  "png", 
+  60,
+  isAutoPlay: false, 
+  color: color1, 
+  onReadyToPlay: onReadyToPlay, 
+  onPlaying: onPlaying)
+```
+
+In this excerpt, the ImageSequenceAnimator animates the frames from the directory
+
+*assets/ImageSequence/* 
+
+Based on the second to fifth parameters, the ImageSequenceAnimator constructs the name format for each image file to be as:
+
+Frame_00000.png, Frame_00001.png, Frame_00002.png, Frame_00003.png ...
+
+The total number of frames is 60. As isAutoPlay set to false, the ImageSequenceAnimator will not start playing 
+immediately. Instead, this example uses onReadyToPlay callback for receiving a reference to the instance of the 
+ImageSequenceAnimator once it is created and then calls functions to loop, boomerang, change the color, play, pause, 
+stop, skip, rewind, restart, etc.
+
+* * *
+##It is highly recommended to read the documentation and the example project.
+
+<br>
 
 ## Notes
 I started using and learning Flutter only some weeks ago so this package might have some parts that don't make sense, 
