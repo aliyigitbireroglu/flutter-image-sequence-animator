@@ -2,11 +2,13 @@
 
 A simple widget for animating a set of images with full custom controls as an alternative to using a GIF file.
 
+**It is highly recommended to read the documentation and run the example project on a real device to fully understand and inspect the full range
+ of capabilities.**
+
 [Media](#media) | [Description](#description) | [How-to-Use](#howtouse)
 
 <img src="https://img.shields.io/badge/Cosmos%20Software-Love%20Code-red"/>
 <br>
-
 
 [![Pub](https://img.shields.io/pub/v/image_sequence_animator?color=g)](https://pub.dev/packages/image_sequence_animator)
 [![License](https://img.shields.io/github/license/aliyigitbireroglu/flutter-image-sequence-animator?color=blue)](https://github.com/aliyigitbireroglu/flutter-image-sequence-animator/blob/master/LICENSE)
@@ -59,10 +61,6 @@ immediately. Instead, this example uses onReadyToPlay callback for receiving a r
 ImageSequenceAnimator once it is created and then calls functions to loop, boomerang, change the color, play, pause, 
 stop, skip, rewind, restart, etc.
 
-* * *
-##It is highly recommended to read the documentation and the example project.
-
-<br>
 
 ## Notes
 I started using and learning Flutter only some weeks ago so this package might have some parts that don't make sense, 
