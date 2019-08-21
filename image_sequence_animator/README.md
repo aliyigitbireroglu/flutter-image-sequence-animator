@@ -4,9 +4,6 @@
 <a href="https://www.cosmossoftware.coffee">
    <img alt="Cosmos Software" src="https://img.shields.io/badge/Cosmos%20Software-Love%20Code-red" />
 </a>
-<a href="https://github.com/Solido/awesome-flutter">
-   <img alt="Awesome Flutter" src="https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true&style=flat-square" />
-</a>
 
 [![Pub](https://img.shields.io/pub/v/image_sequence_animator?color=g)](https://pub.dev/packages/image_sequence_animator)
 [![License](https://img.shields.io/github/license/aliyigitbireroglu/flutter-image-sequence-animator?color=blue)](https://github.com/aliyigitbireroglu/flutter-image-sequence-animator/blob/master/LICENSE)
@@ -28,7 +25,7 @@ A simple widget for animating a set of images with full custom controls as an al
 Watch on **Youtube**:
 
 <a href="https://youtu.be/xZ9vdVkI4Vc">
-   <img alt="Image Sequence Animator" src="https://www.cosmossoftware.coffee/Common/Portfolio/GIFs/FlutterImageSequenceAnimator.jpg" height="450"/>
+   <img alt="Image Sequence Animator" src="https://www.cosmossoftware.coffee/Common/Portfolio/GIFs/FlutterImageSequenceAnimator.jpg" max-height="450"/>
 </a>
 
 
