@@ -20,11 +20,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Image Sequence Animator Demo',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: MyHomePage(title: 'Image Sequence Animator Demo'));
+      title: 'Image Sequence Animator Demo',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: MyHomePage(title: 'Image Sequence Animator Demo'),
+    );
   }
 }
 
@@ -54,19 +53,33 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(widget.title)),
-        body: Column(children: [
+      appBar: AppBar(title: Text(widget.title)),
+      body: Column(
+        children: [
           Expanded(
-              flex: 4,
-              child: Padding(
-                  padding: EdgeInsets.all(25),
-                  child: ImageSequenceAnimator("ImageSequence", "Frame_", 0, 5, "png", 60,
-                      isAutoPlay: false, color: color1, onReadyToPlay: onReadyToPlay, onPlaying: onPlaying))),
+            flex: 4,
+            child: Padding(
+              padding: EdgeInsets.all(25),
+              child: ImageSequenceAnimator(
+                "assets/ImageSequence",
+                "Frame_",
+                0,
+                5,
+                "png",
+                60,
+                isAutoPlay: false,
+                color: color1,
+                onReadyToPlay: onReadyToPlay,
+                onPlaying: onPlaying,
+              ),
+            ),
+          ),
           Expanded(
-              child: Row(children: [
-            Expanded(
-                flex: 4,
-                child: CupertinoSlider(
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 4,
+                  child: CupertinoSlider(
                     value: imageSequenceAnimator == null ? 0.0 : imageSequenceAnimator.animationController.value,
                     min: imageSequenceAnimator == null ? 0.0 : imageSequenceAnimator.animationController.lowerBound,
                     max: imageSequenceAnimator == null ? 100.0 : imageSequenceAnimator.animationController.upperBound,
@@ -79,65 +92,159 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                     onChangeEnd: (double value) {
                       if (wasPlaying) imageSequenceAnimator.play();
-                    })),
-            Expanded(
-                child: Text(
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: Text(
                     imageSequenceAnimator == null
                         ? "0.0"
                         : ((imageSequenceAnimator.currentTime.floor()).toString() + "/" + (imageSequenceAnimator.totalTime.floor()).toString()),
-                    textAlign: TextAlign.center))
-          ])),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
           Expanded(
-              child: Row(children: [
-            Expanded(
-                child: SpringButton(SpringButtonType.OnlyScale, normalRow("Loop", Colors.cyan), useCache: false, onTap: () {
-              setState(() {
-                imageSequenceAnimator.setIsLooping(!imageSequenceAnimator.isLooping);
-              });
-            })),
-            Expanded(
-                child: SpringButton(SpringButtonType.OnlyScale, normalRow("Boomerang", Colors.deepPurpleAccent), useCache: false, onTap: () {
-              setState(() {
-                imageSequenceAnimator.setIsBoomerang(!imageSequenceAnimator.isBoomerang);
-              });
-            }))
-          ])),
+            child: Row(
+              children: [
+                Expanded(
+                  child: SpringButton(
+                    SpringButtonType.OnlyScale,
+                    normalRow(
+                      "Loop",
+                      Colors.cyan,
+                    ),
+                    useCache: false,
+                    onTap: () {
+                      setState(() {
+                        imageSequenceAnimator.setIsLooping(!imageSequenceAnimator.isLooping);
+                      });
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: SpringButton(
+                    SpringButtonType.OnlyScale,
+                    normalRow(
+                      "Boomerang",
+                      Colors.deepPurpleAccent,
+                    ),
+                    useCache: false,
+                    onTap: () {
+                      setState(() {
+                        imageSequenceAnimator.setIsBoomerang(!imageSequenceAnimator.isBoomerang);
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
           Expanded(
-              child: SpringButton(SpringButtonType.OnlyScale, normalRow("Change Colour", Colors.redAccent), useCache: false, onTap: () {
-            imageSequenceAnimator.color = imageSequenceAnimator.color == color1 ? color2 : color1;
-          })),
+            child: SpringButton(
+              SpringButtonType.OnlyScale,
+              normalRow(
+                "Change Colour",
+                Colors.redAccent,
+              ),
+              useCache: false,
+              onTap: () {
+                imageSequenceAnimator.changeColor(imageSequenceAnimator.color == color1 ? color2 : color1);
+              },
+            ),
+          ),
           Expanded(
-              child: Row(children: [
-            Expanded(
-                child: SpringButton(SpringButtonType.OnlyScale, normalRow("Play/Pause", Colors.deepOrangeAccent), useCache: false, onTap: () {
-              setState(() {
-                imageSequenceAnimator.animationController.isAnimating ? imageSequenceAnimator.pause() : imageSequenceAnimator.play();
-              });
-            })),
-            Expanded(
-                child: SpringButton(SpringButtonType.OnlyScale, normalRow("Stop", Colors.green), useCache: false, onTap: () {
-              imageSequenceAnimator.stop();
-            }))
-          ])),
+            child: Row(
+              children: [
+                Expanded(
+                  child: SpringButton(
+                    SpringButtonType.OnlyScale,
+                    normalRow(
+                      "Play/Pause",
+                      Colors.deepOrangeAccent,
+                    ),
+                    useCache: false,
+                    onTap: () {
+                      setState(() {
+                        imageSequenceAnimator.animationController.isAnimating ? imageSequenceAnimator.pause() : imageSequenceAnimator.play();
+                      });
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: SpringButton(
+                    SpringButtonType.OnlyScale,
+                    normalRow(
+                      "Stop",
+                      Colors.green,
+                    ),
+                    useCache: false,
+                    onTap: () {
+                      imageSequenceAnimator.stop();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
           Expanded(
-              child: Row(children: [
-            Expanded(
-                child: SpringButton(SpringButtonType.OnlyScale, normalRow("Restart", Colors.teal), useCache: false, onTap: () {
-              imageSequenceAnimator.restart();
-            })),
-            Expanded(
-                child: SpringButton(SpringButtonType.OnlyScale, normalRow("Rewind", Colors.indigoAccent), useCache: false, onTap: () {
-              imageSequenceAnimator.rewind();
-            }))
-          ]))
-        ]));
+            child: Row(
+              children: [
+                Expanded(
+                  child: SpringButton(
+                    SpringButtonType.OnlyScale,
+                    normalRow(
+                      "Restart",
+                      Colors.teal,
+                    ),
+                    useCache: false,
+                    onTap: () {
+                      imageSequenceAnimator.restart();
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: SpringButton(
+                    SpringButtonType.OnlyScale,
+                    normalRow(
+                      "Rewind",
+                      Colors.indigoAccent,
+                    ),
+                    useCache: false,
+                    onTap: () {
+                      imageSequenceAnimator.rewind();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
 Widget normalRow(String text, Color color) {
   return Padding(
-      padding: EdgeInsets.all(3.125),
-      child: Container(
-          decoration: BoxDecoration(color: color, borderRadius: const BorderRadius.all(const Radius.circular(10.0))),
-          child: Center(child: Text(text, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5)))));
+    padding: EdgeInsets.all(3.125),
+    child: Container(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: const BorderRadius.all(const Radius.circular(10.0)),
+      ),
+      child: Center(
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 12.5,
+          ),
+        ),
+      ),
+    ),
+  );
 }

@@ -72,23 +72,44 @@ class ImageSequenceAnimator extends StatefulWidget {
   ///The callback for when the [ImageSequenceAnimatorState] finishes playing.
   final ImageSequenceProcessCallback onFinishPlaying;
 
-  const ImageSequenceAnimator(this.folderName, this.fileName, this.suffixStart, this.suffixCount, this.fileFormat, this.frameCount,
-      {Key key,
-      this.fps: 60,
-      this.isLooping: false,
-      this.isBoomerang: false,
-      this.isAutoPlay: true,
-      this.color: Colors.white,
-      this.onReadyToPlay,
-      this.onStartPlaying,
-      this.onPlaying,
-      this.onFinishPlaying})
-      : super(key: key);
+  const ImageSequenceAnimator(
+    this.folderName,
+    this.fileName,
+    this.suffixStart,
+    this.suffixCount,
+    this.fileFormat,
+    this.frameCount, {
+    Key key,
+    this.fps: 60,
+    this.isLooping: false,
+    this.isBoomerang: false,
+    this.isAutoPlay: true,
+    this.color: Colors.white,
+    this.onReadyToPlay,
+    this.onStartPlaying,
+    this.onPlaying,
+    this.onFinishPlaying,
+  }) : super(key: key);
 
   @override
   ImageSequenceAnimatorState createState() {
-    return ImageSequenceAnimatorState(folderName, fileName, suffixStart, suffixCount, fileFormat, frameCount, fps, isLooping, isBoomerang, isAutoPlay,
-        color, onReadyToPlay, onStartPlaying, onPlaying, onFinishPlaying);
+    return ImageSequenceAnimatorState(
+      folderName,
+      fileName,
+      suffixStart,
+      suffixCount,
+      fileFormat,
+      frameCount,
+      fps,
+      isLooping,
+      isBoomerang,
+      isAutoPlay,
+      color,
+      onReadyToPlay,
+      onStartPlaying,
+      onPlaying,
+      onFinishPlaying,
+    );
   }
 }
 
@@ -106,9 +127,12 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   bool isBoomerang;
   final bool isAutoPlay;
   Color color;
+  bool colorChanged = false;
 
   ///The [AnimationController] used to control the image sequence.
   AnimationController animationController;
+
+  final ValueNotifier<int> changeNotifier = ValueNotifier<int>(0);
 
   int previousFrame = 0;
   Image currentFrame;
@@ -124,10 +148,27 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   ///Use this value to get the current time of the animation in milliseconds.
   double get currentTime => animationController.value * fpsInMilliseconds;
 
-  ImageSequenceAnimatorState(this.folderName, this.fileName, this.suffixStart, this.suffixCount, this.fileFormat, this.frameCount, this.fps,
-      this.isLooping, this.isBoomerang, this.isAutoPlay, this.color, this.onReadyToPlay, this.onStartPlaying, this.onPlaying, this.onFinishPlaying);
+  ImageSequenceAnimatorState(
+    this.folderName,
+    this.fileName,
+    this.suffixStart,
+    this.suffixCount,
+    this.fileFormat,
+    this.frameCount,
+    this.fps,
+    this.isLooping,
+    this.isBoomerang,
+    this.isAutoPlay,
+    this.color,
+    this.onReadyToPlay,
+    this.onStartPlaying,
+    this.onPlaying,
+    this.onFinishPlaying,
+  );
 
   void animationListener() {
+    changeNotifier.value += 1;
+
     if (onPlaying != null) onPlaying(this);
   }
 
@@ -154,7 +195,11 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
     super.initState();
 
     animationController = AnimationController(
-        vsync: this, lowerBound: 0, upperBound: frameCount, duration: Duration(milliseconds: frameCount.ceil() * fpsInMilliseconds))
+      vsync: this,
+      lowerBound: 0,
+      upperBound: frameCount,
+      duration: Duration(milliseconds: frameCount.ceil() * fpsInMilliseconds),
+    )
       ..addListener(animationListener)
       ..addStatusListener(animationStatusListener);
 
@@ -191,6 +236,13 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
       isLooping = false;
       if (!animationController.isAnimating) restart();
     }
+  }
+
+  ///Use this function to set the value for [ImageSequenceAnimator.color] at runtime.
+  void changeColor(Color color) {
+    this.color = color;
+    colorChanged = true;
+    changeNotifier.value += 1;
   }
 
   void play({double from: -1.0}) {
@@ -235,7 +287,6 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   void reset() {
     animationController.value = 0;
     animationController.stop(canceled: true);
-
     previousFrame = 0;
     currentFrame = null;
   }
@@ -246,19 +297,26 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   }
 
   String getDirectory() {
-    return "assets/" + folderName + "/" + fileName + getSuffix((suffixStart + previousFrame).toString()) + "." + fileFormat;
+    return folderName + "/" + fileName + getSuffix((suffixStart + previousFrame).toString()) + "." + fileFormat;
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-        animation: animationController,
-        builder: (BuildContext context, Widget child) {
-          if (currentFrame == null || animationController.value.floor() != previousFrame) {
-            previousFrame = animationController.value.floor();
-            if (previousFrame < frameCount) currentFrame = Image.asset(getDirectory(), color: color, gaplessPlayback: true);
-          }
-          return currentFrame;
-        });
+    return ValueListenableBuilder(
+      builder: (BuildContext context, int change, Widget cachedChild) {
+        if (currentFrame == null || animationController.value.floor() != previousFrame || colorChanged) {
+          colorChanged = false;
+          previousFrame = animationController.value.floor();
+          if (previousFrame < frameCount)
+            currentFrame = Image.asset(
+              getDirectory(),
+              color: color,
+              gaplessPlayback: true,
+            );
+        }
+        return currentFrame;
+      },
+      valueListenable: changeNotifier,
+    );
   }
 }

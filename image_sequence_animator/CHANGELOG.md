@@ -1,3 +1,9 @@
+## [1.0.4] - 23.08.2019
+
+* Minor changes.
+
+* Improved code style with trailing commas.
+
 ## [1.0.3] - 21.08.2019
 
 * Minor changes.
