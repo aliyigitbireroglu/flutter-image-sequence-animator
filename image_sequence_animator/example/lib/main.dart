@@ -7,7 +7,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //@formatter:off
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -41,6 +40,8 @@ class _MyHomePageState extends State<MyHomePage> {
   bool wasPlaying = false;
   Color color1 = Colors.greenAccent;
   Color color2 = Colors.indigo;
+  String loopText = "Start Loop";
+  String boomerangText = "Start Boomerang";
 
   void onReadyToPlay(ImageSequenceAnimatorState _imageSequenceAnimator) {
     imageSequenceAnimator = _imageSequenceAnimator;
@@ -48,6 +49,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void onPlaying(ImageSequenceAnimatorState _imageSequenceAnimator) {
     setState(() {});
+  }
+
+  Widget row(String text, Color color) {
+    return Padding(
+      padding: EdgeInsets.all(3.125),
+      child: Container(
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: const BorderRadius.all(const Radius.circular(10.0)),
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 12.5,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -96,11 +119,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
                 Expanded(
-                  child: Text(
-                    imageSequenceAnimator == null
-                        ? "0.0"
-                        : ((imageSequenceAnimator.currentTime.floor()).toString() + "/" + (imageSequenceAnimator.totalTime.floor()).toString()),
-                    textAlign: TextAlign.center,
+                  child: Center(
+                    child: Text(
+                      imageSequenceAnimator == null
+                          ? "0.0"
+                          : ((imageSequenceAnimator.currentTime.floor()).toString() + "/" + (imageSequenceAnimator.totalTime.floor()).toString()),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
               ],
@@ -112,13 +137,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 Expanded(
                   child: SpringButton(
                     SpringButtonType.OnlyScale,
-                    normalRow(
-                      "Loop",
+                    row(
+                      loopText,
                       Colors.cyan,
                     ),
                     useCache: false,
                     onTap: () {
                       setState(() {
+                        loopText = imageSequenceAnimator.isLooping ? "Start Loop" : "Stop Loop";
+                        boomerangText = "Start Boomerang";
                         imageSequenceAnimator.setIsLooping(!imageSequenceAnimator.isLooping);
                       });
                     },
@@ -127,13 +154,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 Expanded(
                   child: SpringButton(
                     SpringButtonType.OnlyScale,
-                    normalRow(
-                      "Boomerang",
+                    row(
+                      boomerangText,
                       Colors.deepPurpleAccent,
                     ),
                     useCache: false,
                     onTap: () {
                       setState(() {
+                        loopText = "Start Loop";
+                        boomerangText = imageSequenceAnimator.isBoomerang ? "Start Boomerang" : "Stop Boomerang";
                         imageSequenceAnimator.setIsBoomerang(!imageSequenceAnimator.isBoomerang);
                       });
                     },
@@ -145,7 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(
             child: SpringButton(
               SpringButtonType.OnlyScale,
-              normalRow(
+              row(
                 "Change Colour",
                 Colors.redAccent,
               ),
@@ -161,7 +190,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Expanded(
                   child: SpringButton(
                     SpringButtonType.OnlyScale,
-                    normalRow(
+                    row(
                       "Play/Pause",
                       Colors.deepOrangeAccent,
                     ),
@@ -176,7 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Expanded(
                   child: SpringButton(
                     SpringButtonType.OnlyScale,
-                    normalRow(
+                    row(
                       "Stop",
                       Colors.green,
                     ),
@@ -195,7 +224,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Expanded(
                   child: SpringButton(
                     SpringButtonType.OnlyScale,
-                    normalRow(
+                    row(
                       "Restart",
                       Colors.teal,
                     ),
@@ -208,7 +237,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Expanded(
                   child: SpringButton(
                     SpringButtonType.OnlyScale,
-                    normalRow(
+                    row(
                       "Rewind",
                       Colors.indigoAccent,
                     ),
@@ -225,26 +254,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-}
-
-Widget normalRow(String text, Color color) {
-  return Padding(
-    padding: EdgeInsets.all(3.125),
-    child: Container(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: const BorderRadius.all(const Radius.circular(10.0)),
-      ),
-      child: Center(
-        child: Text(
-          text,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 12.5,
-          ),
-        ),
-      ),
-    ),
-  );
 }

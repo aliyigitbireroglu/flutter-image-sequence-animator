@@ -7,9 +7,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //@formatter:off
 
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 typedef ImageSequenceProcessCallback = void Function(ImageSequenceAnimatorState _imageSequenceAnimator);
@@ -204,6 +201,7 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
       ..addStatusListener(animationStatusListener);
 
     if (isLooping) isBoomerang = false;
+
     if (fileFormat.startsWith(".")) fileFormat = fileFormat.substring(1);
 
     if (onReadyToPlay != null) onReadyToPlay(this);
@@ -213,6 +211,8 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
 
   @override
   void dispose() {
+    reset();
+
     animationController.removeListener(animationListener);
     animationController.removeStatusListener(animationStatusListener);
     animationController.dispose();
@@ -314,6 +314,7 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
               gaplessPlayback: true,
             );
         }
+
         return currentFrame;
       },
       valueListenable: changeNotifier,
