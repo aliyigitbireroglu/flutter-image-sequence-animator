@@ -11,6 +11,9 @@
 [comment]: <> (Introduction)
 A simple widget for animating a set of images with full custom controls as an alternative to using a GIF file.
 
+**If you have a GIF file you would like to use with this package, I recommend [EZGIF](https://ezgif.com/split) to convert your GIF file to an image
+ sequence.**
+
 **It is highly recommended to read the documentation and run the example project on a real device to fully understand and inspect the full range
  of capabilities.**
 
@@ -25,7 +28,7 @@ A simple widget for animating a set of images with full custom controls as an al
 Watch on **Youtube**:
 
 <a href="https://youtu.be/xZ9vdVkI4Vc">
-   <img alt="Image Sequence Animator" src="https://www.cosmossoftware.coffee/Common/Portfolio/GIFs/FlutterImageSequenceAnimator.jpg" max-height="450"/>
+   <img alt="Image Sequence Animator" src="https://www.cosmossoftware.coffee/Common/Portfolio/GIFs/FlutterImageSequenceAnimator.jpg" height="450" max-height="450"/>
 </a>
 
 

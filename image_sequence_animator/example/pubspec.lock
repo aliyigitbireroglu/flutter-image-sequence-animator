@@ -80,7 +80,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.0.5"
+    version: "1.0.5+1"
   matcher:
     dependency: transitive
     description:
@@ -141,7 +141,7 @@ packages:
       name: spring_button
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.8"
+    version: "1.0.8+1"
   stack_trace:
     dependency: transitive
     description:
