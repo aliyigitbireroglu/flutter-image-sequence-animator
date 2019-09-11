@@ -164,7 +164,7 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   );
 
   void animationListener() {
-    changeNotifier.value += 1;
+    changeNotifier.value++;
 
     if (onPlaying != null) onPlaying(this);
   }
@@ -242,7 +242,7 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   void changeColor(Color color) {
     this.color = color;
     colorChanged = true;
-    changeNotifier.value += 1;
+    changeNotifier.value++;
   }
 
   void play({double from: -1.0}) {
