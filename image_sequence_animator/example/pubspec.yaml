@@ -1,26 +1,26 @@
-name: example
-description: Example project for image_sequence_animator.
-version: 1.0.5+1
-author: Ali Yigit Bireroglu <aliyigitbireroglu@gmail.com>
-repository: https://github.com/aliyigitbireroglu/flutter-image-sequence-animator
-homepage: https://www.cosmossoftware.coffee
+name            : example
+description     : Example project for image_sequence_animator.
+version         : 1.0.6
+author          : Ali Yigit Bireroglu <aliyigitbireroglu@gmail.com>
+repository      : https://github.com/aliyigitbireroglu/flutter-image-sequence-animator
+homepage        : https://www.cosmossoftware.coffee
 
-environment:
+environment     :
   sdk: ">=2.1.0 <3.0.0"
 
-dependencies:
-  flutter:
+dependencies    :
+  flutter                :
     sdk: flutter
   image_sequence_animator:
     path: ../
-  spring_button: ^1.0.8+1
+  spring_button          : ^1.0.8+1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-flutter:
+flutter         :
   uses-material-design: true
 
-  assets:
+  assets              :
     - assets/ImageSequence/

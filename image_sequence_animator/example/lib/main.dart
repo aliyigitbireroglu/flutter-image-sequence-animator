@@ -121,9 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Expanded(
                   child: Center(
                     child: Text(
-                      imageSequenceAnimator == null
-                          ? "0.0"
-                          : ((imageSequenceAnimator.currentTime.floor()).toString() + "/" + (imageSequenceAnimator.totalTime.floor()).toString()),
+                      imageSequenceAnimator == null ? "0.0" : ((imageSequenceAnimator.currentTime.floor()).toString() + "/" + (imageSequenceAnimator.totalTime.floor()).toString()),
                       textAlign: TextAlign.center,
                     ),
                   ),
