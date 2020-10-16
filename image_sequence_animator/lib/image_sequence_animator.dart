@@ -153,9 +153,9 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   int _previousCacheFrame = 0;
   int _newCacheFrame;
 
-  Image _currentOfflineFrame;
-  CachedNetworkImage _currentCachedOnlineFrame;
-  CachedNetworkImage _currentDisplayedOnlineFrame;
+  Widget _currentOfflineFrame;
+  Widget _currentCachedOnlineFrame;
+  Widget _currentDisplayedOnlineFrame;
 
   Timer _cacheTimer;
   DateTime _cacheStartDateTime;
@@ -418,7 +418,8 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
                 color: Colors.transparent,
               );
             }
-          }
+          } else
+            _currentCachedOnlineFrame = Container();
           if (_isReadyToPlay) {
             if (_currentDisplayedOnlineFrame == null || _newFrame != _previousFrame || _colorChanged) {
               _colorChanged = false;
@@ -432,12 +433,14 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
                   fadeInDuration: const Duration(milliseconds: 0),
                 );
             }
-          }
+          } else
+            _currentDisplayedOnlineFrame = Container();
+
           return Stack(
             alignment: Alignment.center,
             children: [
-              if (!_isCacheComplete) _currentCachedOnlineFrame,
-              if (_isReadyToPlay) _currentDisplayedOnlineFrame,
+              _currentCachedOnlineFrame,
+              _currentDisplayedOnlineFrame,
             ],
           );
         },

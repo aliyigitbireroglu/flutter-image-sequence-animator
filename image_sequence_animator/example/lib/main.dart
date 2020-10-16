@@ -109,13 +109,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       key: Key("online"),
                       isAutoPlay: true,
                       isOnline: true,
-                      waitUntilCacheIsComplete: true,
-                      cacheProgressIndicatorBuilder: (context, progress) {
-                        return CircularProgressIndicator(
-                          value: progress,
-                          backgroundColor: color1,
-                        );
-                      },
+//                      waitUntilCacheIsComplete: true,
+//                      cacheProgressIndicatorBuilder: (context, progress) {
+//                        return CircularProgressIndicator(
+//                          value: progress,
+//                          backgroundColor: color1,
+//                        );
+//                      },
                       color: color1,
                       onReadyToPlay: onOnlineReadyToPlay,
                       onPlaying: onOnlinePlaying,

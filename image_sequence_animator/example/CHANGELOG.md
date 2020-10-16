@@ -1,9 +1,13 @@
+## [1.0.9] - 16.10.2020
+
+* Minor changes.
+
 ## [1.0.8] - 16.10.2020
 
 * [isOnline] is added. If your [folderName] is an online path, this value should be set to true.
 
 * [waitUntilCacheIsComplete] is added. If you want the [ImageSequenceAnimator] to wait until the entire image sequence is cached, this value should be set
-  to true. Otherwise, the [ImageSequenceAnimator] will invoke [onReadyToPlay] and start playing if [isAutoPlay] is set to true when it approximates that the 
+  to true i. Otherwise, the [ImageSequenceAnimator] will invoke [onReadyToPlay] and start playing if [isAutoPlay] is set to true when it approximates that the 
   remaining caching can be completed without causing stutters. This value is only used if [isOnline] is set to true.
 
 * [cacheProgressIndicatorBuilder] is added. If you want to display a widget until the [ImageSequenceAnimator] is ready to be played, use this function.

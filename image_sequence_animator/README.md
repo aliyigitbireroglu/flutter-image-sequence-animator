@@ -117,7 +117,8 @@ void   _onFinishPlaying(ImageSequenceAnimatorState _imageSequenceAnimator);
 [void setIsLooping(bool isLooping)], [void setIsBoomerang(bool isBoomerang)], [void setColor(Color color)], [void play({double from: -1.0})],
 [void rewind({double from: -1.0})], [void pause()], [void skip(double value, {double percentage: -1.0})], [void restart()], [void stop()] 
 methods for the corresponding actions.
-* Use [ImageSequenceAnimatorState]'s [double get currentTime] and [double get totalTime] methods to get the respective values.
+* Use [ImageSequenceAnimatorState]'s [bool get isLooping], [bool get isBoomerang], [double get currentProgress], [double get totalProgress], 
+[double get currentTime] and [double get totalTime] methods to get the respective values.
 
 
 [comment]: <> (Notes)

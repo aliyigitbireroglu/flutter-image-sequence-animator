@@ -1,3 +1,7 @@
+## [1.0.9] - 16.10.2020
+
+* Minor changes.
+
 ## [1.0.8] - 16.10.2020
 
 * [isOnline] is added. If your [folderName] is an online path, this value should be set to true.
