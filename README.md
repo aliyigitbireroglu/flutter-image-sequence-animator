@@ -20,6 +20,17 @@ A simple widget for animating a set of images with full custom controls as an al
 [comment]: <> (ToC)
 [Media](#media) | [Description](#description) | [How-to-Use](#howtouse)
 
+[comment]: <> (Recent)
+## Recent
+* **[isOnline] is added. If your [folderName] is an online path, this value should be set to true.**
+    
+* **[waitUntilCacheIsComplete] is added. If you want the [ImageSequenceAnimator] to wait until the entire image sequence is cached, this value should be set
+  to true i. Otherwise, the [ImageSequenceAnimator] will invoke [onReadyToPlay] and start playing if [isAutoPlay] is set to true when it approximates that the 
+  remaining caching can be completed without causing stutters. This value is only used if [isOnline] is set to true.**
+  
+* **[cacheProgressIndicatorBuilder] is added. If you want to display a widget until the [ImageSequenceAnimator] is ready to be played, use this function.**
+* * *
+
 
 [comment]: <> (Media)
 <a name="media"></a>
@@ -50,12 +61,12 @@ Then create an ImageSequenceAnimator widget as shown in the example:
 
 ```
 ImageSequenceAnimator(
-  "assets/ImageSequence",   //folderName 
-  "Frame_",                 //fileName
-  0,                        //suffixStart
-  5,                        //suffixCount 
-  "png",                    //fileFormat 
-  60,                       //frameCount
+  "assets/ImageSequences/MyImageSequence",  //folderName 
+  "Frame_",                                 //fileName
+  0,                                        //suffixStart
+  5,                                        //suffixCount 
+  "png",                                    //fileFormat 
+  60,                                       //frameCount
  {Key key,
   fps               : 60,
   isLooping         : false,
@@ -66,11 +77,33 @@ ImageSequenceAnimator(
   onStartPlaying    : _onStartPlaying,
   onPlaying         : _onPlaying,
   onFinishPlaying   : _onFinishPlaying})
+
+ImageSequenceAnimator(
+  "https://www.domain.com/ImageSequences/MyImageSequence",  //folderName 
+  "Frame_",                                                 //fileName
+  0,                                                        //suffixStart
+  5,                                                        //suffixCount 
+  "png",                                                    //fileFormat 
+  60,                                                       //frameCount
+ {Key key,
+  fps               :               60,
+  isLooping         :               false,
+  isBoomerang       :               false,
+  isAutoPlay:                       true,
+  isOnline:                         true,
+  waitUntilCacheIsComplete:         true,
+  cacheProgressIndicatorBuilder:    _cacheProgressIndicatorBuilder,
+  color             :               Colors.white,
+  onReadyToPlay     :               _onReadyToPlay,
+  onStartPlaying    :               _onStartPlaying,
+  onPlaying         :               _onPlaying,
+  onFinishPlaying   :               _onFinishPlaying})
   
-void _onReadyToPlay(ImageSequenceAnimatorState _imageSequenceAnimator);
-void _onStartPlaying(ImageSequenceAnimatorState _imageSequenceAnimator);
-void _onPlaying(ImageSequenceAnimatorState _imageSequenceAnimator);
-void _onFinishPlaying(ImageSequenceAnimatorState _imageSequenceAnimator);  
+Widget _cacheProgressIndicatorBuilder(BuildContext _context , double _progress);  
+void   _onReadyToPlay(ImageSequenceAnimatorState _imageSequenceAnimator);
+void   _onStartPlaying(ImageSequenceAnimatorState _imageSequenceAnimator);
+void   _onPlaying(ImageSequenceAnimatorState _imageSequenceAnimator);
+void   _onFinishPlaying(ImageSequenceAnimatorState _imageSequenceAnimator); 
 ```
 
 **Further Explanations:**

@@ -36,18 +36,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  ImageSequenceAnimatorState imageSequenceAnimator;
+  ImageSequenceAnimatorState get imageSequenceAnimator => isOnline ? onlineImageSequenceAnimator : offlineImageSequenceAnimator;
+  ImageSequenceAnimatorState offlineImageSequenceAnimator;
+  ImageSequenceAnimatorState onlineImageSequenceAnimator;
+
+  bool isOnline = false;
   bool wasPlaying = false;
+
   Color color1 = Colors.greenAccent;
   Color color2 = Colors.indigo;
+
+  String onlineOfflineText = "Use Online";
   String loopText = "Start Loop";
   String boomerangText = "Start Boomerang";
 
-  void onReadyToPlay(ImageSequenceAnimatorState _imageSequenceAnimator) {
-    imageSequenceAnimator = _imageSequenceAnimator;
+  void onOfflineReadyToPlay(ImageSequenceAnimatorState _imageSequenceAnimator) {
+    offlineImageSequenceAnimator = _imageSequenceAnimator;
   }
 
-  void onPlaying(ImageSequenceAnimatorState _imageSequenceAnimator) {
+  void onOfflinePlaying(ImageSequenceAnimatorState _imageSequenceAnimator) {
+    setState(() {});
+  }
+
+  void onOnlineReadyToPlay(ImageSequenceAnimatorState _imageSequenceAnimator) {
+    onlineImageSequenceAnimator = _imageSequenceAnimator;
+  }
+
+  void onOnlinePlaying(ImageSequenceAnimatorState _imageSequenceAnimator) {
     setState(() {});
   }
 
@@ -83,18 +98,40 @@ class _MyHomePageState extends State<MyHomePage> {
             flex: 4,
             child: Padding(
               padding: EdgeInsets.all(25),
-              child: ImageSequenceAnimator(
-                "assets/ImageSequence",
-                "Frame_",
-                0,
-                5,
-                "png",
-                60,
-                isAutoPlay: false,
-                color: color1,
-                onReadyToPlay: onReadyToPlay,
-                onPlaying: onPlaying,
-              ),
+              child: isOnline
+                  ? ImageSequenceAnimator(
+                      "https://www.cosmossoftware.coffee/AppData/ImageSequenceAnimator/ImageSequence",
+                      "Frame_",
+                      0,
+                      5,
+                      "png",
+                      60,
+                      key: Key("online"),
+                      isAutoPlay: true,
+                      isOnline: true,
+                      waitUntilCacheIsComplete: true,
+                      cacheProgressIndicatorBuilder: (context, progress) {
+                        return CircularProgressIndicator(
+                          value: progress,
+                          backgroundColor: color1,
+                        );
+                      },
+                      color: color1,
+                      onReadyToPlay: onOnlineReadyToPlay,
+                      onPlaying: onOnlinePlaying,
+                    )
+                  : ImageSequenceAnimator(
+                      "assets/ImageSequence",
+                      "Frame_",
+                      0,
+                      5,
+                      "png",
+                      60,
+                      key: Key("offline"),
+                      color: color1,
+                      onReadyToPlay: onOfflineReadyToPlay,
+                      onPlaying: onOfflinePlaying,
+                    ),
             ),
           ),
           Expanded(
@@ -103,11 +140,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 Expanded(
                   flex: 4,
                   child: CupertinoSlider(
-                    value: imageSequenceAnimator == null ? 0.0 : imageSequenceAnimator.animationController.value,
-                    min: imageSequenceAnimator == null ? 0.0 : imageSequenceAnimator.animationController.lowerBound,
-                    max: imageSequenceAnimator == null ? 100.0 : imageSequenceAnimator.animationController.upperBound,
+                    value: imageSequenceAnimator == null ? 0.0 : imageSequenceAnimator.currentProgress,
+                    min: 0.0,
+                    max: imageSequenceAnimator == null ? 100.0 : imageSequenceAnimator.totalProgress,
                     onChangeStart: (double value) {
-                      wasPlaying = imageSequenceAnimator.animationController.isAnimating;
+                      wasPlaying = imageSequenceAnimator.isPlaying;
                       imageSequenceAnimator.pause();
                     },
                     onChanged: (double value) {
@@ -170,16 +207,40 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Expanded(
-            child: SpringButton(
-              SpringButtonType.OnlyScale,
-              row(
-                "Change Colour",
-                Colors.redAccent,
-              ),
-              useCache: false,
-              onTap: () {
-                imageSequenceAnimator.changeColor(imageSequenceAnimator.color == color1 ? color2 : color1);
-              },
+            child: Row(
+              children: [
+                Expanded(
+                  child: SpringButton(
+                    SpringButtonType.OnlyScale,
+                    row(
+                      onlineOfflineText,
+                      Colors.orangeAccent,
+                    ),
+                    useCache: false,
+                    onTap: () {
+                      setState(() {
+                        imageSequenceAnimator.stop();
+                        isOnline = !isOnline;
+                        loopText = imageSequenceAnimator == null || imageSequenceAnimator.isLooping ? "Start Loop" : "Stop Loop";
+                        boomerangText = imageSequenceAnimator == null || imageSequenceAnimator.isBoomerang ? "Start Boomerang" : "Stop Boomerang";
+                        onlineOfflineText = isOnline ? "Use Offline" : "Use Onfline";
+                      });
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: SpringButton(
+                    SpringButtonType.OnlyScale,
+                    row(
+                      "Change Colour",
+                      Colors.redAccent,
+                    ),
+                    onTap: () {
+                      imageSequenceAnimator.changeColor(imageSequenceAnimator.color == color1 ? color2 : color1);
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -192,10 +253,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       "Play/Pause",
                       Colors.deepOrangeAccent,
                     ),
-                    useCache: false,
                     onTap: () {
                       setState(() {
-                        imageSequenceAnimator.animationController.isAnimating ? imageSequenceAnimator.pause() : imageSequenceAnimator.play();
+                        imageSequenceAnimator.isPlaying ? imageSequenceAnimator.pause() : imageSequenceAnimator.play();
                       });
                     },
                   ),
@@ -207,7 +267,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       "Stop",
                       Colors.green,
                     ),
-                    useCache: false,
                     onTap: () {
                       imageSequenceAnimator.stop();
                     },
@@ -226,7 +285,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       "Restart",
                       Colors.teal,
                     ),
-                    useCache: false,
                     onTap: () {
                       imageSequenceAnimator.restart();
                     },
@@ -239,7 +297,6 @@ class _MyHomePageState extends State<MyHomePage> {
                       "Rewind",
                       Colors.indigoAccent,
                     ),
-                    useCache: false,
                     onTap: () {
                       imageSequenceAnimator.rewind();
                     },

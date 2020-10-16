@@ -7,14 +7,24 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //@formatter:off
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import 'package:cached_network_image/cached_network_image.dart';
+
+typedef CacheProgressIndicatorBuilder = Widget Function(BuildContext context, double progress);
 typedef ImageSequenceProcessCallback = void Function(ImageSequenceAnimatorState _imageSequenceAnimator);
 
 class ImageSequenceAnimator extends StatefulWidget {
-  ///The folder of your image sequence relative to your assets. For example, if you add your image sequence to
+  ///The directory of your image sequence.
+  ///If [isOnline] is set to false and, for example, if you add your image sequence to
   ///'assets/ImageSequences/MyImageSequence'
-  ///then the [folderName] should be 'ImageSequences/MyImageSequence'. This should be the same for all the images in your image sequence.
+  ///then the [folderName] should be 'assets/ImageSequences/MyImageSequence'.
+  ///If [isOnline] is set to true and, for example, if you add your image sequence to
+  ///'https://www.domain.com/ImageSequences/MyImageSequence'
+  ///then the [folderName] should be 'https://www.domain.com/ImageSequences/MyImageSequence'.
+  ///[folderName] should be the same for all the images in your image sequence.
   final String folderName;
 
   ///The file name for each image in your image sequence excluding the suffix. For example, if the images in your image sequence are named as
@@ -57,16 +67,27 @@ class ImageSequenceAnimator extends StatefulWidget {
   ///Use this value to determine the color for your image sequence.
   final Color color;
 
-  ///The callback for when the [ImageSequenceAnimatorState] is ready to start playing.
+  ///Set this value to true if your [folderName] is an online path.
+  final bool isOnline;
+
+  ///Set this value to true if you want the [ImageSequenceAnimator] to wait until the entire image sequence is cached. Otherwise, the [ImageSequenceAnimator]
+  ///will invoke [onReadyToPlay] and start playing if [isAutoPlay] is set to true when it approximates that the remaining caching can be completed without
+  ///causing stutters. This value is only used if [isOnline] is set to true.
+  final bool waitUntilCacheIsComplete;
+
+  ///Use this function to display a widget until the [ImageSequenceAnimator] is ready to be played. This value is only used if [isOnline] is set to true.
+  final CacheProgressIndicatorBuilder cacheProgressIndicatorBuilder;
+
+  ///The callback for when the [ImageSequenceAnimator] is ready to start playing.
   final ImageSequenceProcessCallback onReadyToPlay;
 
-  ///The callback for when the [ImageSequenceAnimatorState] starts playing.
+  ///The callback for when the [ImageSequenceAnimator] starts playing.
   final ImageSequenceProcessCallback onStartPlaying;
 
-  ///The callback for when the [ImageSequenceAnimatorState] is playing. This callback is continuously through the entire process.
+  ///The callback for when the [ImageSequenceAnimator] is playing. This callback is continuously through the entire process.
   final ImageSequenceProcessCallback onPlaying;
 
-  ///The callback for when the [ImageSequenceAnimatorState] finishes playing.
+  ///The callback for when the [ImageSequenceAnimator] finishes playing.
   final ImageSequenceProcessCallback onFinishPlaying;
 
   const ImageSequenceAnimator(
@@ -81,7 +102,10 @@ class ImageSequenceAnimator extends StatefulWidget {
     this.isLooping: false,
     this.isBoomerang: false,
     this.isAutoPlay: true,
-    this.color: Colors.white,
+    this.color,
+    this.isOnline: false,
+    this.waitUntilCacheIsComplete: false,
+    this.cacheProgressIndicatorBuilder,
     this.onReadyToPlay,
     this.onStartPlaying,
     this.onPlaying,
@@ -93,92 +117,92 @@ class ImageSequenceAnimator extends StatefulWidget {
     return ImageSequenceAnimatorState(
       folderName,
       fileName,
-      suffixStart,
-      suffixCount,
       fileFormat,
-      frameCount,
-      fps,
       isLooping,
       isBoomerang,
-      isAutoPlay,
       color,
-      onReadyToPlay,
-      onStartPlaying,
-      onPlaying,
-      onFinishPlaying,
     );
   }
 }
 
 class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with SingleTickerProviderStateMixin {
-  final String folderName;
-  final String fileName;
-  final int suffixStart;
-  final int suffixCount;
-  String fileFormat;
-  final double frameCount;
-  final double fps;
-  int get fpsInMilliseconds => (1.0 / fps * 1000.0).floor();
+  AnimationController _animationController;
+  final ValueNotifier<int> _changeNotifier = ValueNotifier<int>(0);
 
-  bool isLooping;
-  bool isBoomerang;
-  final bool isAutoPlay;
+  String _folderName;
+  String _fileName;
+  String _fileFormat;
+
+  ///Use this value to check if this [ImageSequenceAnimator] is currently looping.
+  bool get isLooping => _isLooping;
+  bool _isLooping;
+
+  ///Use this value to check if this [ImageSequenceAnimator] is currently boomeranging.
+  bool get isBoomerang => _isBoomerang;
+  bool _isBoomerang;
+
+  ///Use this value to check the current color of this [ImageSequenceAnimator].
   Color color;
-  bool colorChanged = false;
 
-  ///The [AnimationController] used to control the image sequence.
-  AnimationController animationController;
+  bool _isReadyToPlay = false;
+  bool _isCacheComplete = false;
+  bool _colorChanged = false;
 
-  final ValueNotifier<int> changeNotifier = ValueNotifier<int>(0);
+  int _previousFrame = 0;
+  int get _newFrame => _animationController.value.floor();
+  int _previousCacheFrame = 0;
+  int _newCacheFrame;
 
-  int previousFrame = 0;
-  Image currentFrame;
+  Image _currentOfflineFrame;
+  CachedNetworkImage _currentCachedOnlineFrame;
+  CachedNetworkImage _currentDisplayedOnlineFrame;
 
-  final ImageSequenceProcessCallback onReadyToPlay;
-  final ImageSequenceProcessCallback onStartPlaying;
-  final ImageSequenceProcessCallback onPlaying;
-  final ImageSequenceProcessCallback onFinishPlaying;
+  Timer _cacheTimer;
+  DateTime _cacheStartDateTime;
+  int get _cacheMillisProgressed => DateTime.now().difference(_cacheStartDateTime).inMilliseconds;
+  double get _cacheMillisRemaining => _cacheMillisProgressed.toDouble() / _previousCacheFrame.toDouble() * (widget.frameCount - _previousCacheFrame).toDouble();
+  double get _cacheMillisTotal => _cacheMillisProgressed + _cacheMillisRemaining;
 
-  ///Use this value to get the total time of the animation in milliseconds.
-  double get totalTime => animationController.upperBound * fpsInMilliseconds;
+  bool get isPlaying => _animationController != null && _animationController.isAnimating;
+  int get _fpsInMilliseconds => (1.0 / widget.fps * 1000.0).floor();
+
+  ///Use this value to get the current time of the animation in frames.
+  double get currentProgress => _animationController == null ? 0.0 : _animationController.value;
+
+  ///Use this value to get the total time of the animation in frames.
+  double get totalProgress => _animationController == null ? 0.0 : _animationController.upperBound;
 
   ///Use this value to get the current time of the animation in milliseconds.
-  double get currentTime => animationController.value * fpsInMilliseconds;
+  double get currentTime => currentProgress * _fpsInMilliseconds;
+
+  ///Use this value to get the total time of the animation in milliseconds.
+  double get totalTime => totalProgress * _fpsInMilliseconds;
 
   ImageSequenceAnimatorState(
-    this.folderName,
-    this.fileName,
-    this.suffixStart,
-    this.suffixCount,
-    this.fileFormat,
-    this.frameCount,
-    this.fps,
-    this.isLooping,
-    this.isBoomerang,
-    this.isAutoPlay,
+    this._folderName,
+    this._fileName,
+    this._fileFormat,
+    this._isLooping,
+    this._isBoomerang,
     this.color,
-    this.onReadyToPlay,
-    this.onStartPlaying,
-    this.onPlaying,
-    this.onFinishPlaying,
   );
 
   void animationListener() {
-    changeNotifier.value++;
+    _changeNotifier.value++;
 
-    if (onPlaying != null) onPlaying(this);
+    if (widget.onPlaying != null) widget.onPlaying(this);
   }
 
   void animationStatusListener(AnimationStatus animationStatus) {
     switch (animationStatus) {
       case AnimationStatus.completed:
-        if (onFinishPlaying != null) onFinishPlaying(this);
+        if (widget.onFinishPlaying != null) widget.onFinishPlaying(this);
 
         if (isLooping) restart();
         if (isBoomerang) rewind();
         break;
       case AnimationStatus.dismissed:
-        if (onFinishPlaying != null) onFinishPlaying(this);
+        if (widget.onFinishPlaying != null) widget.onFinishPlaying(this);
 
         if (isLooping || isBoomerang) play();
         break;
@@ -191,133 +215,233 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   void initState() {
     super.initState();
 
-    animationController = AnimationController(
+    _animationController = AnimationController(
       vsync: this,
       lowerBound: 0,
-      upperBound: frameCount,
-      duration: Duration(milliseconds: frameCount.ceil() * fpsInMilliseconds),
+      upperBound: widget.frameCount,
+      duration: Duration(milliseconds: widget.frameCount.ceil() * _fpsInMilliseconds),
     )
       ..addListener(animationListener)
       ..addStatusListener(animationStatusListener);
 
-    if (isLooping) isBoomerang = false;
+    if (isLooping) _isBoomerang = false;
 
-    if (fileFormat.startsWith(".")) fileFormat = fileFormat.substring(1);
+    if (_folderName.endsWith("/")) _folderName = _folderName.substring(0, _folderName.indexOf(("/")));
+    if (_fileFormat.startsWith(".")) _fileFormat = _fileFormat.substring(1);
 
-    if (onReadyToPlay != null) onReadyToPlay(this);
-
-    if (isAutoPlay) play();
+    if (!widget.isOnline) {
+      _isReadyToPlay = true;
+      if (widget.onReadyToPlay != null) widget.onReadyToPlay(this);
+      if (widget.isAutoPlay) play();
+    }
   }
 
   @override
   void dispose() {
-    reset();
+    _reset();
 
-    animationController.removeListener(animationListener);
-    animationController.removeStatusListener(animationStatusListener);
-    animationController.dispose();
+    _animationController.removeListener(animationListener);
+    _animationController.removeStatusListener(animationStatusListener);
+    _animationController.dispose();
 
     super.dispose();
   }
 
-  ///Use this function to set the value for [ImageSequenceAnimator.isLooping] at runtime.
+  ///Use this function to set the value for [ImageSequenceAnimatorState.isLooping] at runtime.
   void setIsLooping(bool isLooping) {
-    this.isLooping = isLooping;
+    if (!_isReadyToPlay) return;
+
+    this._isLooping = isLooping;
     if (this.isLooping) {
-      isBoomerang = false;
-      if (!animationController.isAnimating) restart();
+      _isBoomerang = false;
+      if (!_animationController.isAnimating) restart();
     }
   }
 
-  ///Use this function to set the value for [ImageSequenceAnimator.isBoomerang] at runtime.
+  ///Use this function to set the value for [ImageSequenceAnimatorState.isBoomerang] at runtime.
   void setIsBoomerang(bool isBoomerang) {
-    this.isBoomerang = isBoomerang;
+    if (!_isReadyToPlay) return;
+
+    this._isBoomerang = isBoomerang;
     if (this.isBoomerang) {
-      isLooping = false;
-      if (!animationController.isAnimating) restart();
+      _isLooping = false;
+      if (!_animationController.isAnimating) restart();
     }
   }
 
-  ///Use this function to set the value for [ImageSequenceAnimator.color] at runtime.
+  ///Use this function to set the value for [ImageSequenceAnimatorState.color] at runtime.
   void changeColor(Color color) {
+    if (!_isReadyToPlay) return;
+
     this.color = color;
-    colorChanged = true;
-    changeNotifier.value++;
+    _colorChanged = true;
+    _changeNotifier.value++;
   }
 
+  ///Use this function to play this [ImageSequenceAnimator].
   void play({double from: -1.0}) {
-    if (!animationController.isAnimating && onStartPlaying != null) onStartPlaying(this);
+    if (!_isReadyToPlay) return;
+
+    if (!_animationController.isAnimating && widget.onStartPlaying != null) widget.onStartPlaying(this);
 
     if (from == -1.0)
-      animationController.forward();
+      _animationController.forward();
     else
-      animationController.forward(from: from);
+      _animationController.forward(from: from);
   }
 
+  ///Use this function to rewind this [ImageSequenceAnimator].
   void rewind({double from: -1.0}) {
-    if (!animationController.isAnimating && onStartPlaying != null) onStartPlaying(this);
+    if (!_isReadyToPlay) return;
+
+    if (!_animationController.isAnimating && widget.onStartPlaying != null) widget.onStartPlaying(this);
 
     if (from == -1.0)
-      animationController.reverse();
+      _animationController.reverse();
     else
-      animationController.reverse(from: from);
+      _animationController.reverse(from: from);
   }
 
+  ///Use this function to pause this [ImageSequenceAnimator].
   void pause() {
-    animationController.stop();
+    if (!_isReadyToPlay) return;
+
+    _animationController.stop();
   }
 
   ///Only use either value or percentage.
   void skip(double value, {double percentage: -1.0}) {
+    if (!_isReadyToPlay) return;
+
     if (percentage != -1.0)
-      animationController.value = totalTime * percentage;
+      _animationController.value = totalTime * percentage;
     else
-      animationController.value = value;
+      _animationController.value = value;
   }
 
+  ///Use this function to restart this [ImageSequenceAnimator].
   void restart() {
+    if (!_isReadyToPlay) return;
+
     stop();
     play();
   }
 
+  ///Use this function to stop this [ImageSequenceAnimator].
   void stop() {
-    reset();
+    if (!_isReadyToPlay) return;
+
+    _reset();
   }
 
-  void reset() {
-    animationController.value = 0;
-    animationController.stop(canceled: true);
-    previousFrame = 0;
-    currentFrame = null;
+  void _reset() {
+    _animationController.value = 0;
+    _animationController.stop(canceled: true);
+    _previousFrame = 0;
+    _currentOfflineFrame = null;
   }
 
-  String getSuffix(String value) {
-    while (value.length < suffixCount) value = "0" + value;
+  void _cache() {
+    int _value = _previousCacheFrame;
+    _value++;
+
+    if (_value < widget.frameCount) {
+      _previousCacheFrame = _value;
+      _changeNotifier.value++;
+    } else
+      _isCacheComplete = true;
+
+    if (!_isReadyToPlay) {
+      if ((widget.waitUntilCacheIsComplete && _isCacheComplete) || (!widget.waitUntilCacheIsComplete && _cacheMillisRemaining * 0.85 < totalTime)) {
+        _isReadyToPlay = true;
+        if (widget.onReadyToPlay != null) widget.onReadyToPlay(this);
+        if (widget.isAutoPlay) play(from: 0.0);
+      }
+    }
+  }
+
+  String _getSuffix(String value) {
+    while (value.length < widget.suffixCount) value = "0" + value;
     return value;
   }
 
-  String getDirectory() {
-    return folderName + "/" + fileName + getSuffix((suffixStart + previousFrame).toString()) + "." + fileFormat;
+  String _getDirectory() {
+    return _folderName + "/" + _fileName + _getSuffix((widget.suffixStart + _previousFrame).toString()) + "." + _fileFormat;
+  }
+
+  String _getCacheDirectory() {
+    return _folderName + "/" + _fileName + _getSuffix((widget.suffixStart + _previousCacheFrame).toString()) + "." + _fileFormat;
   }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      builder: (BuildContext context, int change, Widget cachedChild) {
-        if (currentFrame == null || animationController.value.floor() != previousFrame || colorChanged) {
-          colorChanged = false;
-          previousFrame = animationController.value.floor();
-          if (previousFrame < frameCount)
-            currentFrame = Image.asset(
-              getDirectory(),
-              color: color,
-              gaplessPlayback: true,
-            );
-        }
+    if (!widget.isOnline)
+      return ValueListenableBuilder(
+        builder: (BuildContext context, int change, Widget cachedChild) {
+          if (_currentOfflineFrame == null || _animationController.value.floor() != _previousFrame || _colorChanged) {
+            _colorChanged = false;
+            _previousFrame = _animationController.value.floor();
+            if (_previousFrame < widget.frameCount)
+              _currentOfflineFrame = Image.asset(
+                _getDirectory(),
+                color: color,
+                gaplessPlayback: true,
+              );
+          }
 
-        return currentFrame;
-      },
-      valueListenable: changeNotifier,
-    );
+          return _currentOfflineFrame;
+        },
+        valueListenable: _changeNotifier,
+      );
+    else
+      return ValueListenableBuilder(
+        builder: (BuildContext context, int change, Widget cachedChild) {
+          if (!_isCacheComplete) {
+            if (_currentCachedOnlineFrame == null || _newCacheFrame != _previousCacheFrame) {
+              _newCacheFrame = _previousCacheFrame;
+              if (_cacheStartDateTime == null) _cacheStartDateTime = DateTime.now();
+              _currentCachedOnlineFrame = CachedNetworkImage(
+                imageUrl: _getCacheDirectory(),
+                progressIndicatorBuilder: (context, url, downloadProgress) {
+                  if (downloadProgress.progress == null) {
+                    _cacheTimer?.cancel();
+                    _cacheTimer = Timer(const Duration(milliseconds: 25), () => _cache());
+                  } else {
+                    _cacheTimer?.cancel();
+                    if (downloadProgress.progress == 1.0) _cache();
+                  }
+                  if (!_isReadyToPlay && widget.cacheProgressIndicatorBuilder != null)
+                    return widget.cacheProgressIndicatorBuilder(context, 1.0 - _cacheMillisRemaining / _cacheMillisTotal);
+                  else
+                    return Container();
+                },
+                color: Colors.transparent,
+              );
+            }
+          }
+          if (_isReadyToPlay) {
+            if (_currentDisplayedOnlineFrame == null || _newFrame != _previousFrame || _colorChanged) {
+              _colorChanged = false;
+              _previousFrame = _animationController.value.floor();
+              if (_previousFrame < widget.frameCount)
+                _currentDisplayedOnlineFrame = CachedNetworkImage(
+                  imageUrl: _getDirectory(),
+                  color: color,
+                  useOldImageOnUrlChange: _isCacheComplete,
+                  fadeOutDuration: const Duration(milliseconds: 0),
+                  fadeInDuration: const Duration(milliseconds: 0),
+                );
+            }
+          }
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              if (!_isCacheComplete) _currentCachedOnlineFrame,
+              if (_isReadyToPlay) _currentDisplayedOnlineFrame,
+            ],
+          );
+        },
+        valueListenable: _changeNotifier,
+      );
   }
 }
