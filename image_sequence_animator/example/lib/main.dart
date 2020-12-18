@@ -50,6 +50,10 @@ class _MyHomePageState extends State<MyHomePage> {
   String loopText = "Start Loop";
   String boomerangText = "Start Boomerang";
 
+  bool _useFullPaths = false;
+  List <String> _fullPathsOffline;
+  List <String> _fullPathsOnline;
+
   void onOfflineReadyToPlay(ImageSequenceAnimatorState _imageSequenceAnimator) {
     offlineImageSequenceAnimator = _imageSequenceAnimator;
   }
@@ -90,6 +94,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_fullPathsOffline == null && _fullPathsOnline==null) {
+      _fullPathsOffline = [];
+      _fullPathsOnline = [];
+      for (int i = 0; i < 60; i++) {
+        String _value = i.toString();
+        while (_value.length < 5) _value = "0" + _value;
+        _fullPathsOffline.add("assets/ImageSequence/Frame_" + _value + ".png");
+        _fullPathsOnline.add("https://www.cosmossoftware.coffee/AppData/ImageSequenceAnimator/ImageSequence/Frame_" + _value + ".png");
+      }
+    }
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: Column(
@@ -107,6 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       "png",
                       60,
                       key: Key("online"),
+                      fullPaths: _useFullPaths ? _fullPathsOffline : null,
                       isAutoPlay: true,
                       isOnline: true,
 //                      waitUntilCacheIsComplete: true,
@@ -128,6 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       "png",
                       60,
                       key: Key("offline"),
+                      fullPaths: _useFullPaths ? _fullPathsOffline : null,
                       color: color1,
                       onReadyToPlay: onOfflineReadyToPlay,
                       onPlaying: onOfflinePlaying,

@@ -22,6 +22,9 @@ A simple widget for animating a set of images with full custom controls as an al
 
 [comment]: <> (Recent)
 ## Recent
+* **[fullPaths] is added. If you would like to specify a list of endpoints for the frames in your image sequence animator, use this value. If set, values for 
+  [folderName], [fileName], [suffixStart], [suffixCount], [fileFormat] and [frameCount] will be ignored.**
+
 * **[isOnline] is added. If your [folderName] is an online path, this value should be set to true.**
     
 * **[waitUntilCacheIsComplete] is added. If you want the [ImageSequenceAnimator] to wait until the entire image sequence is cached, this value should be set
@@ -86,6 +89,7 @@ ImageSequenceAnimator(
   "png",                                                    //fileFormat 
   60,                                                       //frameCount
  {Key key,
+  fullPahts         :               [],  
   fps               :               60,
   isLooping         :               false,
   isBoomerang       :               false,

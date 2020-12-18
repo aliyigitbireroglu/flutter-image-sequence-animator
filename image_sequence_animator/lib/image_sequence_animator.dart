@@ -51,6 +51,10 @@ class ImageSequenceAnimator extends StatefulWidget {
   ///The total number of images in your image sequence.
   final double frameCount;
 
+  ///Use this value if you would like to specify a list of endpoints for the frames in your image sequence animator. If set, values for [folderName],
+  ///[fileName], [suffixStart], [suffixCount], [fileFormat] and [frameCount] will be ignored.
+  final List<String> fullPaths;
+
   ///The FPS for your image sequence. For example, if your [frameCount] is 60 and the animation is meant to run in 1 second, then your [fps] should
   /// be 60.
   final double fps;
@@ -98,6 +102,7 @@ class ImageSequenceAnimator extends StatefulWidget {
     this.fileFormat,
     this.frameCount, {
     Key key,
+    this.fullPaths,
     this.fps: 60,
     this.isLooping: false,
     this.isBoomerang: false,
@@ -132,6 +137,8 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   String _folderName;
   String _fileName;
   String _fileFormat;
+  double get _frameCount => _useFullPaths ? widget.fullPaths.length * 1.0 : widget.frameCount;
+  bool get _useFullPaths => widget.fullPaths != null && widget.fullPaths.isNotEmpty;
 
   ///Use this value to check if this [ImageSequenceAnimator] is currently looping.
   bool get isLooping => _isLooping;
@@ -160,7 +167,7 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   Timer _cacheTimer;
   DateTime _cacheStartDateTime;
   int get _cacheMillisProgressed => DateTime.now().difference(_cacheStartDateTime).inMilliseconds;
-  double get _cacheMillisRemaining => _cacheMillisProgressed.toDouble() / _previousCacheFrame.toDouble() * (widget.frameCount - _previousCacheFrame).toDouble();
+  double get _cacheMillisRemaining => _cacheMillisProgressed.toDouble() / _previousCacheFrame.toDouble() * (_frameCount - _previousCacheFrame).toDouble();
   double get _cacheMillisTotal => _cacheMillisProgressed + _cacheMillisRemaining;
 
   bool get isPlaying => _animationController != null && _animationController.isAnimating;
@@ -218,8 +225,8 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
     _animationController = AnimationController(
       vsync: this,
       lowerBound: 0,
-      upperBound: widget.frameCount,
-      duration: Duration(milliseconds: widget.frameCount.ceil() * _fpsInMilliseconds),
+      upperBound: _frameCount,
+      duration: Duration(milliseconds: _frameCount.ceil() * _fpsInMilliseconds),
     )
       ..addListener(animationListener)
       ..addStatusListener(animationStatusListener);
@@ -345,7 +352,7 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
     int _value = _previousCacheFrame;
     _value++;
 
-    if (_value < widget.frameCount) {
+    if (_value < _frameCount) {
       _previousCacheFrame = _value;
       _changeNotifier.value++;
     } else
@@ -366,10 +373,16 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   }
 
   String _getDirectory() {
+    if ( _useFullPaths ) {
+      return widget.fullPaths [ _previousFrame ];
+    }
     return _folderName + "/" + _fileName + _getSuffix((widget.suffixStart + _previousFrame).toString()) + "." + _fileFormat;
   }
 
   String _getCacheDirectory() {
+    if ( _useFullPaths ) {
+      return widget.fullPaths [ _previousCacheFrame ];
+    }
     return _folderName + "/" + _fileName + _getSuffix((widget.suffixStart + _previousCacheFrame).toString()) + "." + _fileFormat;
   }
 
@@ -381,7 +394,7 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
           if (_currentOfflineFrame == null || _animationController.value.floor() != _previousFrame || _colorChanged) {
             _colorChanged = false;
             _previousFrame = _animationController.value.floor();
-            if (_previousFrame < widget.frameCount)
+            if (_previousFrame < _frameCount)
               _currentOfflineFrame = Image.asset(
                 _getDirectory(),
                 color: color,
@@ -424,7 +437,7 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
             if (_currentDisplayedOnlineFrame == null || _newFrame != _previousFrame || _colorChanged) {
               _colorChanged = false;
               _previousFrame = _animationController.value.floor();
-              if (_previousFrame < widget.frameCount)
+              if (_previousFrame < _frameCount)
                 _currentDisplayedOnlineFrame = CachedNetworkImage(
                   imageUrl: _getDirectory(),
                   color: color,

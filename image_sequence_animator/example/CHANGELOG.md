@@ -1,3 +1,8 @@
+## [1.0.10] - 18.12.2020
+
+* [fullPaths] is added. If you would like to specify a list of endpoints for the frames in your image sequence animator, use this value. If set, values for 
+  [folderName], [fileName], [suffixStart], [suffixCount], [fileFormat] and [frameCount] will be ignored.
+
 ## [1.0.9] - 16.10.2020
 
 * Minor changes.
