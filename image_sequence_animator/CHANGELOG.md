@@ -1,3 +1,7 @@
+## [2.0.0] - 3.9.2021
+
+* Added null safety and flutter 2 support.
+
 ## [1.0.10] - 18.12.2020
 
 * [fullPaths] is added. If you would like to specify a list of endpoints for the frames in your image sequence animator, use this value. If set, values for 
