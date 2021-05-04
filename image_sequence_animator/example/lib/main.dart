@@ -27,18 +27,18 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  ImageSequenceAnimatorState get imageSequenceAnimator => isOnline ? onlineImageSequenceAnimator : offlineImageSequenceAnimator;
-  ImageSequenceAnimatorState offlineImageSequenceAnimator;
-  ImageSequenceAnimatorState onlineImageSequenceAnimator;
+  ImageSequenceAnimatorState? get imageSequenceAnimator => isOnline ? onlineImageSequenceAnimator : offlineImageSequenceAnimator;
+  ImageSequenceAnimatorState? offlineImageSequenceAnimator;
+  ImageSequenceAnimatorState? onlineImageSequenceAnimator;
 
   bool isOnline = false;
   bool wasPlaying = false;
@@ -51,8 +51,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String boomerangText = "Start Boomerang";
 
   bool _useFullPaths = false;
-  List <String> _fullPathsOffline;
-  List <String> _fullPathsOnline;
+  List<String>? _fullPathsOffline;
+  List<String>? _fullPathsOnline;
 
   void onOfflineReadyToPlay(ImageSequenceAnimatorState _imageSequenceAnimator) {
     offlineImageSequenceAnimator = _imageSequenceAnimator;
@@ -94,18 +94,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_fullPathsOffline == null && _fullPathsOnline==null) {
+    if (_fullPathsOffline == null && _fullPathsOnline == null) {
       _fullPathsOffline = [];
       _fullPathsOnline = [];
       for (int i = 0; i < 60; i++) {
         String _value = i.toString();
         while (_value.length < 5) _value = "0" + _value;
-        _fullPathsOffline.add("assets/ImageSequence/Frame_" + _value + ".png");
-        _fullPathsOnline.add("https://www.cosmossoftware.coffee/AppData/ImageSequenceAnimator/ImageSequence/Frame_" + _value + ".png");
+        _fullPathsOffline!.add("assets/ImageSequence/Frame_" + _value + ".png");
+        _fullPathsOnline!.add("https://www.cosmossoftware.coffee/AppData/ImageSequenceAnimator/ImageSequence/Frame_" + _value + ".png");
       }
     }
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(title: Text(widget.title!)),
       body: Column(
         children: [
           Expanded(
@@ -156,25 +156,25 @@ class _MyHomePageState extends State<MyHomePage> {
                 Expanded(
                   flex: 4,
                   child: CupertinoSlider(
-                    value: imageSequenceAnimator == null ? 0.0 : imageSequenceAnimator.currentProgress,
+                    value: imageSequenceAnimator == null ? 0.0 : imageSequenceAnimator!.currentProgress,
                     min: 0.0,
-                    max: imageSequenceAnimator == null ? 100.0 : imageSequenceAnimator.totalProgress,
+                    max: imageSequenceAnimator == null ? 100.0 : imageSequenceAnimator!.totalProgress,
                     onChangeStart: (double value) {
-                      wasPlaying = imageSequenceAnimator.isPlaying;
-                      imageSequenceAnimator.pause();
+                      wasPlaying = imageSequenceAnimator!.isPlaying;
+                      imageSequenceAnimator!.pause();
                     },
                     onChanged: (double value) {
-                      imageSequenceAnimator.skip(value);
+                      imageSequenceAnimator!.skip(value);
                     },
                     onChangeEnd: (double value) {
-                      if (wasPlaying) imageSequenceAnimator.play();
+                      if (wasPlaying) imageSequenceAnimator!.play();
                     },
                   ),
                 ),
                 Expanded(
                   child: Center(
                     child: Text(
-                      imageSequenceAnimator == null ? "0.0" : ((imageSequenceAnimator.currentTime.floor()).toString() + "/" + (imageSequenceAnimator.totalTime.floor()).toString()),
+                      imageSequenceAnimator == null ? "0.0" : ((imageSequenceAnimator!.currentTime.floor()).toString() + "/" + (imageSequenceAnimator!.totalTime.floor()).toString()),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -195,9 +195,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     useCache: false,
                     onTap: () {
                       setState(() {
-                        loopText = imageSequenceAnimator.isLooping ? "Start Loop" : "Stop Loop";
+                        loopText = imageSequenceAnimator!.isLooping ? "Start Loop" : "Stop Loop";
                         boomerangText = "Start Boomerang";
-                        imageSequenceAnimator.setIsLooping(!imageSequenceAnimator.isLooping);
+                        imageSequenceAnimator!.setIsLooping(!imageSequenceAnimator!.isLooping);
                       });
                     },
                   ),
@@ -213,8 +213,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     onTap: () {
                       setState(() {
                         loopText = "Start Loop";
-                        boomerangText = imageSequenceAnimator.isBoomerang ? "Start Boomerang" : "Stop Boomerang";
-                        imageSequenceAnimator.setIsBoomerang(!imageSequenceAnimator.isBoomerang);
+                        boomerangText = imageSequenceAnimator!.isBoomerang ? "Start Boomerang" : "Stop Boomerang";
+                        imageSequenceAnimator!.setIsBoomerang(!imageSequenceAnimator!.isBoomerang);
                       });
                     },
                   ),
@@ -235,10 +235,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     useCache: false,
                     onTap: () {
                       setState(() {
-                        imageSequenceAnimator.stop();
+                        imageSequenceAnimator!.stop();
                         isOnline = !isOnline;
-                        loopText = imageSequenceAnimator == null || imageSequenceAnimator.isLooping ? "Start Loop" : "Stop Loop";
-                        boomerangText = imageSequenceAnimator == null || imageSequenceAnimator.isBoomerang ? "Start Boomerang" : "Stop Boomerang";
+                        loopText = imageSequenceAnimator == null || imageSequenceAnimator!.isLooping ? "Start Loop" : "Stop Loop";
+                        boomerangText = imageSequenceAnimator == null || imageSequenceAnimator!.isBoomerang ? "Start Boomerang" : "Stop Boomerang";
                         onlineOfflineText = isOnline ? "Use Offline" : "Use Onfline";
                       });
                     },
@@ -252,7 +252,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       Colors.redAccent,
                     ),
                     onTap: () {
-                      imageSequenceAnimator.changeColor(imageSequenceAnimator.color == color1 ? color2 : color1);
+                      imageSequenceAnimator!.changeColor(imageSequenceAnimator!.color == color1 ? color2 : color1);
                     },
                   ),
                 ),
@@ -271,7 +271,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     onTap: () {
                       setState(() {
-                        imageSequenceAnimator.isPlaying ? imageSequenceAnimator.pause() : imageSequenceAnimator.play();
+                        imageSequenceAnimator!.isPlaying ? imageSequenceAnimator!.pause() : imageSequenceAnimator!.play();
                       });
                     },
                   ),
@@ -284,7 +284,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       Colors.green,
                     ),
                     onTap: () {
-                      imageSequenceAnimator.stop();
+                      imageSequenceAnimator!.stop();
                     },
                   ),
                 ),
@@ -302,7 +302,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       Colors.teal,
                     ),
                     onTap: () {
-                      imageSequenceAnimator.restart();
+                      imageSequenceAnimator!.restart();
                     },
                   ),
                 ),
@@ -314,7 +314,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       Colors.indigoAccent,
                     ),
                     onTap: () {
-                      imageSequenceAnimator.rewind();
+                      imageSequenceAnimator!.rewind();
                     },
                   ),
                 ),

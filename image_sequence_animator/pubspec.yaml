@@ -1,17 +1,17 @@
 name            : image_sequence_animator
 description     : A simple widget for animating a set of images with full custom controls as an alternative to using a GIF file.
-version         : 1.0.10
+version         : 2.0.0
 author          : Ali Yigit Bireroglu <aliyigitbireroglu@gmail.com>
 repository      : https://github.com/aliyigitbireroglu/flutter-image-sequence-animator
 homepage        : https://www.cosmossoftware.coffee
 
 environment     :
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies    :
   flutter:
     sdk: flutter
-  cached_network_image: ^2.3.3
+  cached_network_image: ^3.0.0
 
 dev_dependencies:
   flutter_test:

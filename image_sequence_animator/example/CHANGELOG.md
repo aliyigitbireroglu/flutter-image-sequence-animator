@@ -1,3 +1,7 @@
+## [2.0.0] - 04.05.2021
+
+* Migrated to Null Safety.
+
 ## [1.0.10] - 18.12.2020
 
 * [fullPaths] is added. If you would like to specify a list of endpoints for the frames in your image sequence animator, use this value. If set, values for 
