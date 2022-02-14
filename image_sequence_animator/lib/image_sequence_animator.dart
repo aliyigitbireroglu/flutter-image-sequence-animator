@@ -94,6 +94,9 @@ class ImageSequenceAnimator extends StatefulWidget {
   ///The callback for when the [ImageSequenceAnimator] finishes playing.
   final ImageSequenceProcessCallback? onFinishPlaying;
 
+  ///The image fit
+  final BoxFit? fit;
+
   const ImageSequenceAnimator(
     this.folderName,
     this.fileName,
@@ -115,6 +118,7 @@ class ImageSequenceAnimator extends StatefulWidget {
     this.onStartPlaying,
     this.onPlaying,
     this.onFinishPlaying,
+    this.fit,
   }) : super(key: key);
 
   @override
@@ -399,6 +403,7 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
                 _getDirectory(),
                 color: color,
                 gaplessPlayback: true,
+                fit: widget.fit,
               );
           }
 
@@ -429,6 +434,7 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
                     return Container();
                 },
                 color: Colors.transparent,
+                fit: widget.fit,
               );
             }
           } else
@@ -444,6 +450,7 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
                   useOldImageOnUrlChange: _isCacheComplete,
                   fadeOutDuration: const Duration(milliseconds: 0),
                   fadeInDuration: const Duration(milliseconds: 0),
+                  fit: widget.fit,
                 );
             }
           } else
