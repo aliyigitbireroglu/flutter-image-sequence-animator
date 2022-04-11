@@ -39,7 +39,7 @@ A simple widget for animating a set of images with full custom controls as an al
 Watch on **Youtube**:
 
 <a href="https://youtu.be/xZ9vdVkI4Vc">
-   <img alt="Image Sequence Animator" src="https://www.cosmossoftware.coffee/Common/Portfolio/GIFs/FlutterImageSequenceAnimator.jpg" height="450" max-height="450"/>
+   <img alt="Image Sequence Animator" src="https://user-images.githubusercontent.com/51419598/162646149-e9dbe6bc-7663-4dd5-918a-44aa56a1fc5c.png" height="450" max-height="450"/>
 </a>
 
 
@@ -59,46 +59,53 @@ First, add your image sequence to your assets and update the "pubspec.yaml" acco
 
 Then create an ImageSequenceAnimator widget as shown in the example:
 
-```
+```dart
 ImageSequenceAnimator(
-  "assets/ImageSequences/MyImageSequence",  //folderName 
-  "Frame_",                                 //fileName
-  0,                                        //suffixStart
-  5,                                        //suffixCount 
-  "png",                                    //fileFormat 
-  60,                                       //frameCount
- {Key key,
-  fps               : 60,
-  isLooping         : false,
-  isBoomerang       : false,
-  isAutoPlay        : true,
-  color             : Colors.white,
-  onReadyToPlay     : _onReadyToPlay,
-  onStartPlaying    : _onStartPlaying,
-  onPlaying         : _onPlaying,
-  onFinishPlaying   : _onFinishPlaying})
+  "assets/ImageSequences/MyImageSequence", /// folderName 
+  "Frame_", /// fileName
+  0, /// suffixStart
+  5, /// suffixCount 
+  "png", /// fileFormat 
+  60, /// frameCount
+  {
+    Key key,
+    fps: 60,
+    isLooping: false,
+    isBoomerang: false,
+    isAutoPlay: true,
+    color: Colors.white,
+    onReadyToPlay: _onReadyToPlay,
+    onStartPlaying: _onStartPlaying,
+    onPlaying: _onPlaying,
+    onFinishPlaying: _onFinishPlaying
+  },
+)
 
 ImageSequenceAnimator(
-  "https://www.domain.com/ImageSequences/MyImageSequence",  //folderName 
-  "Frame_",                                                 //fileName
-  0,                                                        //suffixStart
-  5,                                                        //suffixCount 
-  "png",                                                    //fileFormat 
-  60,                                                       //frameCount
- {Key key,
-  fps               :               60,
-  isLooping         :               false,
-  isBoomerang       :               false,
-  isAutoPlay:                       true,
-  isOnline:                         true,
-  waitUntilCacheIsComplete:         true,
-  cacheProgressIndicatorBuilder:    _cacheProgressIndicatorBuilder,
-  color             :               Colors.white,
-  onReadyToPlay     :               _onReadyToPlay,
-  onStartPlaying    :               _onStartPlaying,
-  onPlaying         :               _onPlaying,
-  onFinishPlaying   :               _onFinishPlaying})
-  
+  "https://www.domain.com/ImageSequences/MyImageSequence", /// folderName 
+  "Frame_", /// fileName
+  0, /// suffixStart
+  5, /// suffixCount 
+  "png", /// fileFormat 
+  60, /// frameCount
+  /// Named parameters
+  {
+    Key key,
+    fps:60,
+    isLooping: false,
+    isBoomerang: false,
+    isAutoPlay: true,
+    isOnline: true,
+    waitUntilCacheIsComplete: true,
+    cacheProgressIndicatorBuilder: _cacheProgressIndicatorBuilder,
+    color: Colors.white,
+    onReadyToPlay: _onReadyToPlay,
+    onStartPlaying: _onStartPlaying,
+    onPlaying: _onPlaying,
+    onFinishPlaying: _onFinishPlaying,
+  },
+)
+
 Widget _cacheProgressIndicatorBuilder(BuildContext _context , double _progress);  
 void   _onReadyToPlay(ImageSequenceAnimatorState _imageSequenceAnimator);
 void   _onStartPlaying(ImageSequenceAnimatorState _imageSequenceAnimator);
@@ -132,5 +139,5 @@ Cheers.
 
 [comment]: <> (CosmosSoftware)
 <br><br>
-<img align="right" src="https://www.cosmossoftware.coffee/Common/Images/CosmosSoftwareIconTransparent.png" width="150" height="150"/>
+<img align="right" src="https://user-images.githubusercontent.com/51419598/162646125-f0ee782c-0911-4175-b20b-61cf65604b42.png" width="150" height="150"/>
 <br><br>
